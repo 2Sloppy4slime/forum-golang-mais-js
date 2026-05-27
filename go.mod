@@ -2,14 +2,18 @@ module forum
 
 go 1.25.0
 
-require golang.org/x/crypto v0.52.0
+require (
+	github.com/glebarez/go-sqlite v1.22.0
+	golang.org/x/crypto v0.52.0
+)
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-sqlite3 v1.14.44 // indirect
+	github.com/ncruces/go-sqlite3 v0.34.2 // indirect
+	github.com/ncruces/go-sqlite3-wasm/v2 v2.4.35301 // indirect
+	github.com/ncruces/julianday v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	golang.org/x/sys v0.45.0 // indirect
 	modernc.org/libc v1.37.6 // indirect

@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"text/template"
 
-	_ "github.com/glebarez/go-sqlite"
+	_ "github.com/ncruces/go-sqlite3/driver"
+	_ "github.com/ncruces/go-sqlite3/embed"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -17,7 +18,7 @@ var templates *template.Template
 func main() {
 	var err error
 
-	db, err = sql.Open("sqlite", "./bdd/bdd.db")
+	db, err = sql.Open("sqlite3", "./bdd/bdd.db")
 	if err != nil {
 		log.Fatal("Erreur d'ouverture de la BDD :", err)
 	}
@@ -26,16 +27,14 @@ func main() {
 	if err = db.Ping(); err != nil {
 		log.Fatal("Impossible de communiquer avec bdd.db :", err)
 	}
-	fmt.Println("--> Connexion à bdd.db réussie (Sans CGO !) <--")
-
+	fmt.Println("--> Connexion à bdd.db réussie avec succès ! <--")
 
 	templates = template.Must(template.ParseGlob("webapp/pages/*.html"))
 
-	
-	http.HandleFunc("/", homeHandler)         
-	http.HandleFunc("/login", loginHandler)      
-	http.HandleFunc("/register", registerHandler) 
-	http.HandleFunc("/topic", topicHandler)     
+	http.HandleFunc("/", homeHandler)
+	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/register", registerHandler)
+	http.HandleFunc("/topic", topicHandler)
 
 	fmt.Println("Serveur démarré sur : http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -51,13 +50,8 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		fmt.Println("Tentative de connexion reçue")
-		return
-	}
 	templates.ExecuteTemplate(w, "login.html", nil)
 }
-
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -71,21 +65,19 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		http.Error(w, "Erreur lors du traitement du mot de passe", http.StatusInternalServerError)
+		http.Error(w, "Erreur de hachage", http.StatusInternalServerError)
 		return
 	}
 
 	query := `INSERT INTO Comptes (Username, Email, PasswordEncrypted) VALUES (?, ?, ?)`
 	_, err = db.Exec(query, username, email, string(hashedPassword))
-	
 	if err != nil {
-		fmt.Println("Erreur BDD à l'insertion :", err)
-		http.Error(w, "Erreur d'inscription (Nom d'utilisateur ou Email déjà pris).", http.StatusBadRequest)
+		fmt.Println("Erreur BDD lors de l'insertion :", err)
+		http.Error(w, "Erreur d'inscription (Pseudo/Email déjà pris)", http.StatusBadRequest)
 		return
 	}
 
-	fmt.Printf("Nouveau compte créé avec succès : %s !\n", username)
-	
+	fmt.Printf("Compte créé avec succès pour : %s !\n", username)
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
