@@ -58,6 +58,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "login.html", nil)
 }
 
+
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -65,6 +66,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	username := r.FormValue("username")
+	email := r.FormValue("email")
 	password := r.FormValue("password")
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -73,14 +75,17 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = db.Exec("INSERT INTO users (username, password) VALUES (?, ?)", username, string(hashedPassword))
+	query := `INSERT INTO Comptes (Username, Email, PasswordEncrypted) VALUES (?, ?, ?)`
+	_, err = db.Exec(query, username, email, string(hashedPassword))
+	
 	if err != nil {
 		fmt.Println("Erreur BDD à l'insertion :", err)
-		http.Error(w, "Nom d'utilisateur déjà pris ou erreur de base de données.", http.StatusBadRequest)
+		http.Error(w, "Erreur d'inscription (Nom d'utilisateur ou Email déjà pris).", http.StatusBadRequest)
 		return
 	}
 
-	fmt.Printf("Nouvel utilisateur créé avec succès : %s !\n", username)
+	fmt.Printf("Nouveau compte créé avec succès : %s !\n", username)
+	
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
