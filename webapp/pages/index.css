@@ -1,0 +1,22 @@
+body{
+    background-color: rgb(244, 220, 220);
+}
+
+.conx{
+    position:absolute;
+    width:5.7vw;
+    height:5.2vh;
+    background-color:beige;
+    right:0.7vw;
+    top:1.8vh;
+    border: 2px solid slategrey;
+    border-radius: 5px;
+}
+
+.title{
+    margin-left:15vw;
+    width:70vw;
+    border-radius: 15px;
+    border: 2px solid slategrey;
+    background-color:beige;
+}
