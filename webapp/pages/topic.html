@@ -5,10 +5,58 @@
     <title>Détails du Sujet</title>
 </head>
 <body>
-    <h1>Titre du Sujet</h1>
-    <p>Contenu du post...</p>
+    <p><a href="/">← Retour à l'accueil</a></p>
+    <hr>
+
+    <fieldset>
+        <legend>Sujet posté par : {{.Post.AuthorName}} (Catégorie : {{.Post.CategoryName}})</legend>
+        <h2>{{.Post.Text}}</h2>
+        
+        <p>👍 {{.Post.LikesCount}} | 👎 {{.Post.DislikesCount}}</p>
+
+        {{if .UserConnected}}
+            <form action="/post/like?id={{.Post.Id}}" method="POST" style="display:inline;">
+                <button type="submit">👍 Liker</button>
+            </form>
+            <form action="/post/dislike?id={{.Post.Id}}" method="POST" style="display:inline;">
+                <button type="submit">👎 Disliker</button>
+            </form>
+        {{end}}
+    </fieldset>
+
     <hr>
     <h3>Commentaires</h3>
-    <a href="/">Retour à l'accueil</a>
+
+    {{range .Comments}}
+        <div style="border-left: 3px solid #ccc; padding-left: 10px; margin-bottom: 15px;">
+            <p><strong>{{.AuthorName}}</strong> a dit :</p>
+            <p>{{.Text}}</p>
+            <p>👍 {{.LikesCount}} | 👎 {{.DislikesCount}}</p>
+            
+            {{if $.UserConnected}}
+                <form action="/comment/like?id={{.Id}}&topic_id={{$.Post.Id}}" method="POST" style="display:inline;">
+                    <button type="submit">👍 Like</button>
+                </form>
+                <form action="/comment/dislike?id={{.Id}}&topic_id={{$.Post.Id}}" method="POST" style="display:inline;">
+                    <button type="submit">👎 Dislike</button>
+                </form>
+            {{end}}
+        </div>
+    {{else}}
+        <p>Pas encore de commentaires. Soyez le premier à répondre !</p>
+    {{end}}
+
+    <hr>
+    {{if .UserConnected}}
+        <h4>Ajouter un commentaire :</h4>
+        <form action="/comment/create?topic_id={{.Post.Id}}" method="POST">
+            <textarea name="text" rows="3" cols="50" required placeholder="Écris ton commentaire ici..."></textarea>
+            <br><br>
+            <button type="submit">Envoyer</button>
+        </form>
+    {{else}}
+        <p><a href="/login">Connecte-toi</a> pour laisser un commentaire !</p>
+    {{end}}
+
 </body>
 </html>
