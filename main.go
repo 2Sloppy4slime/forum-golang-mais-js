@@ -24,14 +24,14 @@ type PostData struct {
 	Id            int
 	UserID        int
 	CategoryId    int
-	Text          string
+	Title         string 
+	Description   string 
 	CategoryName  string
 	AuthorName    string
 	LikesCount    int
 	DislikesCount int
 	CommentsCount int
 }
-
 type CommentData struct {
 	Id            int
 	UserID        int
@@ -143,11 +143,11 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var posts []PostData
-	rowsPost, err := db.Query("SELECT Id, UserID, CategoryId, Text FROM Poste")
+	rowsPost, err := db.Query("SELECT Id, UserID, CategoryId, Title, Description FROM Poste")
 	if err == nil {
 		for rowsPost.Next() {
 			var p PostData
-			if errScan := rowsPost.Scan(&p.Id, &p.UserID, &p.CategoryId, &p.Text); errScan == nil {
+			if errScan := rowsPost.Scan(&p.Id, &p.UserID, &p.CategoryId, &p.Title, &p.Description); errScan == nil {
 				db.QueryRow("SELECT Username FROM Comptes WHERE Id = ?", p.UserID).Scan(&p.AuthorName)
 				db.QueryRow("SELECT Name FROM Category WHERE Id = ?", p.CategoryId).Scan(&p.CategoryName)
 				db.QueryRow("SELECT COUNT(*) FROM Commentaire WHERE PostID = ?", p.Id).Scan(&p.CommentsCount)
@@ -252,9 +252,10 @@ func createPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	userID := getUserID(username)
 	categoryID, _ := strconv.Atoi(r.FormValue("category_id"))
-	text := r.FormValue("text")
+	title := r.FormValue("title")      
+	description := r.FormValue("text") 
 
-	_, err := db.Exec("INSERT INTO Poste (UserID, CategoryId, Text, UserID_Likes, UserID_Dislikes) VALUES (?, ?, ?, '', '')", userID, categoryID, text)
+	_, err := db.Exec("INSERT INTO Poste (UserID, CategoryId, Title, Description, UserID_Likes, UserID_Dislikes) VALUES (?, ?, ?, ?, '', '')", userID, categoryID, title, description)
 	if err != nil {
 		fmt.Println("Erreur création poste :", err)
 	}
@@ -267,7 +268,7 @@ func topicHandler(w http.ResponseWriter, r *http.Request) {
 	username, connected := getUserSession(r)
 
 	var p PostData
-	err := db.QueryRow("SELECT Id, UserID, CategoryId, Text FROM Poste WHERE Id = ?", postID).Scan(&p.Id, &p.UserID, &p.CategoryId, &p.Text)
+	err := db.QueryRow("SELECT Id, UserID, CategoryId, Title, Description FROM Poste WHERE Id = ?", postID).Scan(&p.Id, &p.UserID, &p.CategoryId, &p.Title, &p.Description)
 	if err != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return

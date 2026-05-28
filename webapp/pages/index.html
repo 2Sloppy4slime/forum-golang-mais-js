@@ -7,9 +7,9 @@
 </head>
 <body>
     <div class="title">
-    <center>
-    <h1>Forum</H1>
-    </center>
+        <center>
+            <h1>Forum</h1>
+        </center>
     </div>
 
     {{if .UserConnected}}
@@ -18,6 +18,9 @@
         <hr>
         <h2>Créer un nouveau sujet (Poste)</h2>
         <form action="/post/create" method="POST">
+            <label for="title">Titre de ton sujet :</label><br>
+            <input type="text" name="title" id="title" required placeholder="Écris un titre accrocheur..." style="width: 350px; padding: 5px;"><br><br>
+
             <label for="category">Choisir une catégorie :</label>
             <select name="category_id" id="category" required>
                 {{range .Categories}}
@@ -25,9 +28,11 @@
                 {{end}}
             </select>
             <br><br>
-            <label for="text">Contenu de ton poste :</label><br>
-            <textarea name="text" id="text" rows="4" cols="50" required placeholder="Écris ton sujet ici..."></textarea>
+            
+            <label for="text">Contenu de ton poste (Description) :</label><br>
+            <textarea name="text" id="text" rows="4" cols="50" required placeholder="Écris le contenu de ton sujet ici..."></textarea>
             <br><br>
+            
             <button type="submit">Publier le sujet</button>
         </form>
     {{else}}
@@ -53,9 +58,11 @@
     <hr>
     <h2>Liste des Sujets</h2>
     {{range .Posts}}
-        <fieldset style="margin-bottom: 15px;">
-            <legend>Catégorie : {{.CategoryName}} | Posté par : {{.AuthorName}}</legend>
-            <p>{{.Text}}</p>
+        <fieldset style="margin-bottom: 15px; padding: 15px;">
+            <legend>Catégorie : <strong>{{.CategoryName}}</strong> | Posté par : <strong>{{.AuthorName}}</strong></legend>
+            
+            <h3>{{.Title}}</h3>
+            <p>{{.Description}}</p>
             
             <p>👍 {{.LikesCount}} | 👎 {{.DislikesCount}}</p>
             
